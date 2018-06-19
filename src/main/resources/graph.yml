@@ -1,0 +1,4 @@
+denim:
+  name: Hello
+  project:
+    workspace: /tmp

@@ -1,0 +1,25 @@
+spring:
+  jpa:
+    hibernate.ddl-auto: create-drop
+    generate-ddl: true
+    properties:
+      hibernate.dialect: org.hibernate.dialect.H2Dialect
+      
+  profiles: test
+  h2:
+    console:
+      enabled: true
+      path: /h2console
+  logging:
+    file: boot_example.log
+
+  datasource:
+    username: sa
+    password: sa
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:bootexample;MODE=MySQL
+    
+    
+---
+denim: 
+  name: Hello
