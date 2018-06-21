@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sitdh.thesis.core.denim.database.entity.AccessToken;
+import com.sitdh.thesis.core.denim.database.entity.User;
 import com.sitdh.thesis.core.denim.database.repository.AccessTokenRepository;
 import com.sitdh.thesis.core.denim.database.service.UserService;
 import com.sitdh.thesis.core.denim.form.entity.UserEntity;
+import com.sitdh.thesis.core.denim.ws.error.ErrorMessageResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,8 +45,25 @@ public class UserServiceController {
 	@PostMapping("/account/new")
 	public ResponseEntity<?> createNewUser(@ModelAttribute UserEntity userEntity) {
 		log.debug("Create new user: " + userEntity.getUsername());
+				
+		Optional<User> user = userService.createNewUser(userEntity);
+		ResponseEntity<?> response;
+		
+		if (user.isPresent()) {
+			log.debug("Data valid");
+			response = new ResponseEntity<>(user.get(), headers, HttpStatus.ACCEPTED);
+		} else {
+			log.error("Invalid data");
+			ErrorMessageResponse errorMessage = ErrorMessageResponse.builder()
+					.description("No data information")
+					.message("Invalid information")
+					.timestamp(new Date())
+					.build();
+			
+			response = new ResponseEntity<>(errorMessage, headers, HttpStatus.BAD_REQUEST);
+		}
 
-		return new ResponseEntity<>(userService.createNewUser(userEntity), headers, HttpStatus.OK);
+		return response;
 	}
 	
 	@GetMapping("/account/{username}")

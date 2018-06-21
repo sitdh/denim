@@ -59,7 +59,6 @@ public class UserService {
 			newUser = Optional.of(tmpUser);
 		} else {
 			log.debug("Invalid user");
-			System.out.println(u);
 		}
 		
 		return newUser;
