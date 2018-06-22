@@ -1,7 +1,9 @@
 package com.sitdh.thesis.core.denim.database.service;
 
 import java.util.Date;
+import java.util.Optional;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -51,5 +53,30 @@ public class AccessTokenService {
 		token = this.accessToken.save(token);
 		
 		return new AuthenticatedInformationResponseEntity(token);
+	}
+
+	public Optional<AuthenticatedInformationResponseEntity> renewForToken(String accessToken, String client) {
+		Optional<AccessToken> accToken = this.accessToken.findByTokenAndClientNameAndExpiredDateAfter(accessToken, client, new Date());
+		
+		Optional<AuthenticatedInformationResponseEntity> authInfoEntity = Optional.ofNullable(null);
+		if (accToken.isPresent()) {
+			AuthenticatedInformationResponseEntity at = new AuthenticatedInformationResponseEntity(accToken.get());
+			authInfoEntity = Optional.ofNullable(at);
+		}
+		
+		return authInfoEntity;
+	}
+	
+	public Optional<AccessToken> accessTokenForUserCredential(String token, String username) {
+		
+		return this.accessToken
+				.findByTokenAndExpiredDateAfter(token, new Date())
+				.filter(t -> t.getOwner().getUsername().equals(username));
+	}
+
+	public void killAccessToken(AccessToken accessToken) {
+		accessToken.setExpiredDate(DateUtils.addDays(new Date(), -30));
+		
+		this.accessToken.save(accessToken);
 	}
 }

@@ -54,7 +54,7 @@ public class User {
 	@OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL, mappedBy="owner")
 	private List<AccessToken> tokens;
 	
-	@JsonIgnore
+	@JsonProperty(value="projects") @JsonFormat(shape=JsonFormat.Shape.ARRAY)
 	@OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL, mappedBy="owner")
 	private List<Project> projects;
 

@@ -13,4 +13,6 @@ public interface AccessTokenRepository extends JpaRepository<AccessToken, Intege
 
 	public Optional<AccessToken> findByTokenAndClientNameAndExpiredDateAfter(String token, String clientName, Date currentDate);
 	
+	public Optional<AccessToken> findByTokenAndExpiredDateAfter(String token, Date currentDate);
+	
 }

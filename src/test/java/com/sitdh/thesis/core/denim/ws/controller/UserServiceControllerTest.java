@@ -1,6 +1,7 @@
 package com.sitdh.thesis.core.denim.ws.controller;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -21,6 +22,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.sitdh.thesis.core.denim.database.entity.AccessToken;
 import com.sitdh.thesis.core.denim.database.entity.User;
 import com.sitdh.thesis.core.denim.database.service.AccessTokenService;
 import com.sitdh.thesis.core.denim.database.service.UserService;
@@ -43,6 +45,8 @@ public class UserServiceControllerTest {
 	private User user;
 	
 	private AuthenticatedInformationResponseEntity authEntity;
+	
+	private AccessToken accessToken;
 	
 	@BeforeClass
 	public static void environmentSetup() {
@@ -67,6 +71,14 @@ public class UserServiceControllerTest {
 		authEntity.setAccessedDate(new Date());
 		authEntity.setEmail(user.getEmail());
 		authEntity.setExpiredDate(new Date());
+		
+		accessToken = new AccessToken();
+		accessToken.setAti(1);
+		accessToken.setClientName("Lorem Ipsum");
+		accessToken.setToken("ant-horse-rock");
+		accessToken.setCreatedDate(new Date());
+		accessToken.setExpiredDate(new Date());
+		accessToken.setOwner(user);
 	}
 
 	@Test
@@ -181,6 +193,86 @@ public class UserServiceControllerTest {
 		).andDo(print())
 		.andExpect(status().isUnauthorized())
 		.andExpect(jsonPath("$.title").value("Unauthorized"))
+		.andExpect(jsonPath("$.description").isNotEmpty())
+		;
+	}
+	
+	@Test
+	public void renew_for_access_token() throws Exception {
+		when(userService.getUserFromUsernameAndPassword("johnd", "password"))
+			.thenReturn(Optional.of(user));
+	
+		when(accessTokenService.createAccessTokenForUser(Mockito.any(User.class))).thenReturn(authEntity);
+		
+		when(accessTokenService.renewForToken("monkey-snake-rabbit", "Lorem Ipsum"))
+			.thenReturn(Optional.ofNullable(authEntity));
+	
+		this.mockMvc
+		.perform(
+			post("/account/renew")
+				.param("client", "Lorem Ipsum")
+				.param("access_token", "monkey-snake-rabbit")
+		).andDo(print())
+		.andExpect(status().isOk())
+		.andExpect(jsonPath("$.username").value(user.getUsername()))
+		.andExpect(jsonPath("$.email").value(user.getEmail()))
+		.andExpect(jsonPath("$.access_token").value("monkey-snake-rabbit"))
+		.andExpect(jsonPath("$.accessed_date").exists())
+		.andExpect(jsonPath("$.client_name").exists())
+		.andExpect(jsonPath("$.expired_date").exists())
+		;
+	}
+	
+	@Test
+	public void unknown_user_should_not_renew_access_token() throws Exception {
+		when(userService.getUserFromUsernameAndPassword("johnd", "password"))
+			.thenReturn(Optional.of(user));
+	
+		this.mockMvc
+		.perform(
+			post("/account/renew")
+				.param("client", "Jaque Garage")
+				.param("access_token", "someone-that-i-used-to-know")
+		).andDo(print())
+		.andExpect(status().isBadRequest())
+		.andExpect(jsonPath("$.title").value("Invalid credential"))
+		.andExpect(jsonPath("$.description").isNotEmpty())
+		;
+	}
+	
+	@Test
+	public void signout_for_valid_credential() throws Exception {
+
+		when(accessTokenService.accessTokenForUserCredential("monkey-snake-rabbit", "johnd"))
+			.thenReturn(Optional.ofNullable(accessToken));
+	
+		this.mockMvc
+		.perform(
+			get("/account/signout/johnd")
+				.param("username", "johnd")
+				.param("client", "John Corner")
+				.param("access_token", "monkey-snake-rabbit")
+		).andDo(print())
+		.andExpect(status().isOk())
+		.andExpect(jsonPath("$.title").value("Signout completed"))
+		.andExpect(jsonPath("$.description").exists())
+		;
+	}
+	
+	@Test
+	public void signout_for_invalid_credential() throws Exception {
+		
+		when(accessTokenService.accessTokenForUserCredential("monkey-snake-rabbit", "johnd"))
+		.thenReturn(Optional.ofNullable(accessToken));
+		
+		this.mockMvc
+		.perform(
+			get("/account/signout/johnd")
+				.param("username", "johnd")
+				.param("access_token", "someone-that-i-used-to-know")
+		).andDo(print())
+		.andExpect(status().isBadRequest())
+		.andExpect(jsonPath("$.title").value("Invalid credential"))
 		.andExpect(jsonPath("$.description").isNotEmpty())
 		;
 	}
