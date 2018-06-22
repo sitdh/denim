@@ -109,9 +109,10 @@ public class UserServiceController {
 		
 		Optional<AuthenticatedInformationResponseEntity> token = this.accessTokenService.renewForToken(accessToken, client);
 		if (token.isPresent()) {
+			log.debug("Credential found");
 			response = new ResponseEntity<>(token.get(), headers, HttpStatus.OK);
 		} else {
-			log.error("Invalid data");
+			log.error("Invalid credential");
 			ErrorMessageResponse errorMessage = ErrorMessageResponse.builder()
 					.description("Credential not found")
 					.title("Invalid credential")
@@ -134,6 +135,7 @@ public class UserServiceController {
 		
 		Optional<AccessToken> accToken = this.accessTokenService.accessTokenForUserCredential(token, username);
 		if (accToken.isPresent()) {
+			log.debug("Credential found, killing access token");
 			this.accessTokenService.killAccessToken(accToken.get());
 			
 			responseMessage = ErrorMessageResponse.builder()
@@ -143,6 +145,7 @@ public class UserServiceController {
 					.build();
 			
 		} else {
+			log.debug("Invalid access token");
 			responseMessage = ErrorMessageResponse.builder()
 					.title("Invalid credential")
 					.description("No credential found.")
