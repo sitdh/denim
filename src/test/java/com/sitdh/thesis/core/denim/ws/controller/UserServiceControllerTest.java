@@ -263,7 +263,7 @@ public class UserServiceControllerTest {
 	public void signout_for_invalid_credential() throws Exception {
 		
 		when(accessTokenService.accessTokenForUserCredential("monkey-snake-rabbit", "johnd"))
-		.thenReturn(Optional.ofNullable(accessToken));
+			.thenReturn(Optional.ofNullable(accessToken));
 		
 		this.mockMvc
 		.perform(
