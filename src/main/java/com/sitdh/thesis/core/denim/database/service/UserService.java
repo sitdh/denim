@@ -10,6 +10,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.sitdh.thesis.core.denim.database.entity.User;
@@ -30,7 +31,7 @@ public class UserService {
 	private Validator validator;
 	
 	@Autowired
-	public UserService(UserRepository userRepo, HashMessage hashMessage) {
+	public UserService(UserRepository userRepo, @Qualifier("SHADigest") HashMessage hashMessage) {
 		this.userRepo = userRepo;
 		this.hashMessage = hashMessage;
 		

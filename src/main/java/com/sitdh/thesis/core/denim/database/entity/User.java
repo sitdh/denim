@@ -42,12 +42,12 @@ public class User {
 	
 	@Column(name="created_date")
 	@JsonProperty(value="created_date")
-	@JsonFormat(locale="th", shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Bangkok")
+	@JsonFormat(locale="th", shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Bangkok")
 	private Date createdDate;
 	
 	@Column(name="lastest_update")
 	@JsonProperty(value="lastest_update")
-	@JsonFormat(locale="th", shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Bangkok")
+	@JsonFormat(locale="th", shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Bangkok")
 	private Date lastestUpdate;
 	
 	@JsonIgnore

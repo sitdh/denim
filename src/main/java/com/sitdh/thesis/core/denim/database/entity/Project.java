@@ -44,11 +44,11 @@ public class Project {
 	private String description;
 	
 	@JsonProperty(value="created_date")
-	@JsonFormat(locale="th", shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Bangkok")
+	@JsonFormat(locale="th", shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss'Z", timezone = "Asia/Bangkok")
 	private Date createdDate;
 	
 	@JsonProperty(value="last_update")
-	@JsonFormat(locale="th", shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Bangkok")
+	@JsonFormat(locale="th", shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss'Z", timezone = "Asia/Bangkok")
 	private Date lastUpdate;
 	
 	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)

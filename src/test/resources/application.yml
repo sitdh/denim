@@ -19,7 +19,7 @@ spring:
 logging:
   level:
     org.org.springframework: ERROR
-    com.sitdh.thesis.core.denim: DEBUG
+    com.sitdh.thesis.core.denim: ERROR
     
 ---
 denim: 

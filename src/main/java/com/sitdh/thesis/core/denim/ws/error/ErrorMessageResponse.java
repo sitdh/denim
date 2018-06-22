@@ -10,7 +10,7 @@ import lombok.Data;
 @Data @Builder
 public class ErrorMessageResponse {
 	
-	private String message;
+	private String title;
 	
 	private String description;
 	
