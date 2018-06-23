@@ -26,14 +26,18 @@ public class UserService {
 	
 	private UserRepository userRepo;
 	
-	private HashMessage hashMessage;
+	private HashMessage hashMessage, gravatarEmailHash;
 	
 	private Validator validator;
 	
 	@Autowired
-	public UserService(UserRepository userRepo, @Qualifier("SHADigest") HashMessage hashMessage) {
+	public UserService(UserRepository userRepo, 
+			@Qualifier("SHADigest") HashMessage hashMessage,
+			@Qualifier("GravatarHash") HashMessage gravatarEmailHash
+			) {
 		this.userRepo = userRepo;
 		this.hashMessage = hashMessage;
+		this.gravatarEmailHash = gravatarEmailHash;
 		
 		validator = Validation.buildDefaultValidatorFactory().getValidator();
 	}
@@ -55,11 +59,20 @@ public class UserService {
 			tmpUser.setPassword(
 					this.hashMessage.hash(user.getPassword()));
 			tmpUser.setUsername(user.getUsername());
+			
+			tmpUser.setAvatar(
+					String.format(
+							"https://www.gravatar.com/avatar/%s", 
+							this.gravatarEmailHash.hash(user.getEmail())));
+			
 			tmpUser = this.userRepo.save(tmpUser);
 			
 			newUser = Optional.of(tmpUser);
 		} else {
 			log.debug("Invalid user");
+			u.stream().forEach(c -> {
+				log.debug(c.getInvalidValue() + ": " + c.getMessage());
+			});
 		}
 		
 		return newUser;

@@ -1,9 +1,13 @@
 package com.sitdh.thesis.core.denim.database.service;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.sitdh.thesis.core.denim.database.entity.Project;
+import com.sitdh.thesis.core.denim.database.entity.User;
 import com.sitdh.thesis.core.denim.database.repository.ProjectRepository;
 import com.sitdh.thesis.core.denim.form.entity.ProjectEntity;
 
@@ -22,6 +26,10 @@ public class ProjectService {
 	}
 
 	public Project createProject(ProjectEntity projectEntity) {
-		
+		return null;
+	}
+
+	public Optional<List<Project>> fetchProjectForOwner(User user) {
+		return projectRepo.findAllByOwner(user);
 	}
 }

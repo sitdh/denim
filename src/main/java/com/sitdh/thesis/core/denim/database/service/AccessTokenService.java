@@ -3,7 +3,6 @@ package com.sitdh.thesis.core.denim.database.service;
 import java.util.Date;
 import java.util.Optional;
 
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -14,6 +13,7 @@ import com.sitdh.thesis.core.denim.database.entity.User;
 import com.sitdh.thesis.core.denim.database.repository.AccessTokenRepository;
 import com.sitdh.thesis.core.denim.form.entity.AuthenticatedInformationResponseEntity;
 import com.sitdh.thesis.core.denim.util.hash.HashMessage;
+import com.sitdh.thesis.core.denim.utils.DateTimeUtils;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -60,8 +60,17 @@ public class AccessTokenService {
 		
 		Optional<AuthenticatedInformationResponseEntity> authInfoEntity = Optional.ofNullable(null);
 		if (accToken.isPresent()) {
-			AuthenticatedInformationResponseEntity at = new AuthenticatedInformationResponseEntity(accToken.get());
+			
+			log.debug("Access token exists");
+			
+			AccessToken renewedToken = this.updateExpireDate(accToken.get());
+			renewedToken = this.accessToken.save(renewedToken);
+			
+			AuthenticatedInformationResponseEntity at = new AuthenticatedInformationResponseEntity(renewedToken);
 			authInfoEntity = Optional.ofNullable(at);
+			
+		} else {
+			log.debug("Access token not found");
 		}
 		
 		return authInfoEntity;
@@ -75,8 +84,17 @@ public class AccessTokenService {
 	}
 
 	public void killAccessToken(AccessToken accessToken) {
-		accessToken.setExpiredDate(DateUtils.addDays(new Date(), -30));
+		accessToken.setExpiredDate(DateTimeUtils.addDays(new Date(), -30));
 		
 		this.accessToken.save(accessToken);
+	}
+	
+	private AccessToken updateExpireDate(AccessToken accessToken) {
+		Date renewedDate = DateTimeUtils.addDays(accessToken.getExpiredDate(), 3);
+		if (DateTimeUtils.compareDate(accessToken.getExpiredDate(), renewedDate) <= 7) {
+			accessToken.setExpiredDate(renewedDate);
+		}
+		
+		return accessToken;
 	}
 }

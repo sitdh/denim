@@ -4,6 +4,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Data;
 
 @Data
@@ -18,7 +20,7 @@ public class UserEntity {
 	@NotEmpty @Size(min=4, max=50)
 	private String password;
 	
-	@NotEmpty @Size(min=4, max=50)
+	@NotEmpty @Size(min=4, max=50) @JsonProperty(value="confirmed_password")
 	private String confirmedPassword;
 	
 	@Email

@@ -64,15 +64,6 @@ public class AccessToken {
 	
 	@PreUpdate
 	public void updateDate() {
-		Date date = new Date();
-		Instant localDatetime = date.toInstant()
-				.atZone(ZoneId.systemDefault())
-				.toLocalDateTime()
-				.plusDays(1)
-				.atZone(ZoneId.systemDefault())
-				.toInstant();
-		
-		this.setLastestAccessDate(date);
-		this.setExpiredDate(Date.from(localDatetime));
+		this.setLastestAccessDate(new Date());
 	}
 }

@@ -12,6 +12,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 
@@ -40,6 +42,8 @@ public class User {
 	
 	private String name;
 	
+	private String avatar;
+	
 	@Column(name="created_date")
 	@JsonProperty(value="created_date")
 	@JsonFormat(locale="th", shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Bangkok")
@@ -57,5 +61,17 @@ public class User {
 	@JsonProperty(value="projects") @JsonFormat(shape=JsonFormat.Shape.ARRAY)
 	@OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL, mappedBy="owner")
 	private List<Project> projects;
+	
+	@PrePersist
+	public void beforeCreate() {
+		Date date = new Date();
+		this.setCreatedDate(date);
+		this.setLastestUpdate(date);
+	}
+	
+	@PreUpdate
+	public void updateTimestamp() {
+		this.setLastestUpdate(new Date());
+	}
 
 }

@@ -26,6 +26,8 @@ public class AuthenticatedInformationResponseEntity {
 	@JsonProperty(value="client_name")
 	private String clientName;
 	
+	private String avatar;
+	
 	@Past @JsonProperty(value="accessed_date")
 	@JsonFormat(locale="th", shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Bangkok")
 	private Date accessedDate;
@@ -42,6 +44,7 @@ public class AuthenticatedInformationResponseEntity {
 		this.setUsername(token.getOwner().getUsername());
 		this.setEmail(token.getOwner().getEmail());
 		this.setAccessToken(token.getToken());
+		this.setAvatar(token.getOwner().getAvatar());
 		
 		this.setClientName(token.getClientName());
 		
