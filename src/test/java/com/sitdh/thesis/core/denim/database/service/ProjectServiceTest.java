@@ -67,7 +67,6 @@ public class ProjectServiceTest {
 		aProject = List.of(p);
 		projects = List.of(p, p2);
 		otherUserProjects = List.of(p2);
-		
 	}
 
 	@Test

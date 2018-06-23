@@ -10,6 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.sitdh.thesis.core.denim.file.archive.ArchiveManager;
 
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 @PropertySource("classpath:/graph.yml")
 public class ProjectFileStorageService implements StorageService {
@@ -22,13 +26,13 @@ public class ProjectFileStorageService implements StorageService {
 	}
 
 	@Override
-	public Optional<String> store(MultipartFile multipartFile, String projectSlug) {
+	public Optional<String> store(@NonNull MultipartFile multipartFile,@NonNull String projectSlug) {
 		
 		Optional<String> location = null;
 		
 		try {
 			location = archiver.extract(multipartFile.getInputStream(), projectSlug);
-			
+			log.debug("File was saved");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

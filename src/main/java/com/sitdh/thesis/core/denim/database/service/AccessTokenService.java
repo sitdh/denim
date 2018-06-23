@@ -77,7 +77,7 @@ public class AccessTokenService {
 	}
 	
 	public Optional<AccessToken> accessTokenForUserCredential(String token, String username) {
-		
+		log.debug("Get token for user: " + username);
 		return this.accessToken
 				.findByTokenAndExpiredDateAfter(token, new Date())
 				.filter(t -> t.getOwner().getUsername().equals(username));
