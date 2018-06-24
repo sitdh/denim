@@ -32,20 +32,19 @@ public class ProjectReceiverServiceControllerTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		String zipFileLocation = new ClassPathResource("/test.zip").getFile().getAbsolutePath();
+		String zipFileLocation = new ClassPathResource("/green.zip").getFile().getAbsolutePath();
 		zip = new FileInputStream(new File(zipFileLocation));
 	}
 
-	@Test
 	public void project_should_crate_with_welled_form_information() throws Exception {
-		MockMultipartFile mmf = new MockMultipartFile("test.zip", "", "multipart/form-data", zip);
+		MockMultipartFile mmf = new MockMultipartFile("green.zip", "", "multipart/form-data", zip);
 		mockMvc.perform(
 				MockMvcRequestBuilders.multipart("/project/new")
 					.file("file", mmf.getBytes())
 					.characterEncoding("UTF-8")
-					.param("project_name", "Lorem")
+					.param("project", "Lorem")
 					.param("description", "ipsum")
-					.param("package", "com.sitdh.demo")
+					.param("pkg", "com.sitdh.demo")
 				)
 		.andDo(print())
 		.andExpect(status().isOk())

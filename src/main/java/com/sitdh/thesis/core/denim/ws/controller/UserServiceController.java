@@ -69,8 +69,23 @@ public class UserServiceController {
 	}
 	
 	@GetMapping("/account/{username}")
-	public void userProfile(String user) {
+	public ResponseEntity<?> userProfile(@PathVariable("username") String user, @RequestParam("token") String token) {
+		Optional<AccessToken> accToken = this.accessTokenService
+				.accessTokenForUserCredential(token, user);
 		
+		ResponseEntity<?> response = null;
+		if (accToken.isPresent()) {
+			response = new ResponseEntity<>(accToken.get(), headers, HttpStatus.OK);
+		} else {
+			ErrorMessageResponse errorMessage = ErrorMessageResponse.builder()
+					.description("Wrong username credential")
+					.title("Unauthorized")
+					.timestamp(new Date())
+					.build();
+			response = new ResponseEntity<>(errorMessage, headers, HttpStatus.BAD_REQUEST);
+		}
+		
+		return response;
 	}
 	
 	@PostMapping("/account/auth")
