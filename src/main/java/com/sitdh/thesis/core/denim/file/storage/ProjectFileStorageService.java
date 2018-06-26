@@ -85,8 +85,8 @@ public class ProjectFileStorageService implements StorageService {
 					.collect(Collectors.toList())
 					;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			log.error(e.getMessage());
 		}
 			
 		return paths;

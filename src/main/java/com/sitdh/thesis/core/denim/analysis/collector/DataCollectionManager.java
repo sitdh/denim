@@ -14,18 +14,28 @@ import org.springframework.stereotype.Component;
 
 import com.sitdh.thesis.core.denim.database.entity.FileInformation;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class DataCollectionManager {
 	
 	private List<CodeInformationCollector> collectors;
 	
+	private MethodCollection methodCollection;
+	
 	@Autowired
-	public DataCollectionManager(List<CodeInformationCollector> collectors) {
+	public DataCollectionManager(
+			List<CodeInformationCollector> collectors,
+			MethodCollection methodCollection) {
+		
 		this.collectors = collectors;
+		this.methodCollection = methodCollection;
 	}
 
 	public void accept(FileInformation fileInfo) {
 		try {
+			log.debug("Accept for class: " + fileInfo.getClassName());
 			JavaClass javaParser = new ClassParser(fileInfo.getLocation()).parse();
 			
 			ConstantPool constantPool = javaParser.getConstantPool();
@@ -37,6 +47,8 @@ public class DataCollectionManager {
 				
 				this.notifyConsntantWithFileInfo(constant, constantPool, fileInfo);
 			}
+			
+			this.methodCollection.accept(fileInfo);
 			
 		} catch (ClassFormatException | IOException e) {
 			// TODO Auto-generated catch block
