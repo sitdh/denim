@@ -14,7 +14,9 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.sitdh.thesis.core.denim.database.entity.Project;
 import com.sitdh.thesis.core.denim.file.archive.ArchiveManager;
+import com.sitdh.thesis.core.denim.file.storage.observer.StorageObserver;
 import com.sitdh.thesis.core.denim.file.storage.validation.SourcecodeFolderValidator;
 import com.sitdh.thesis.core.denim.file.storage.validation.TargetFolderValidator;
 
@@ -28,18 +30,24 @@ public class ProjectFileStorageService implements StorageService {
 	
 	private ArchiveManager archiver;
 	
+	private List<StorageObserver> observers;
+	
 	@Autowired
-	ProjectFileStorageService(ArchiveManager archiver) {
+	ProjectFileStorageService(
+			ArchiveManager archiver, 
+			List<StorageObserver> observers) {
+		
 		this.archiver = archiver;
+		this.observers = observers;
 	}
 
 	@Override
-	public Optional<String> store(@NonNull MultipartFile multipartFile,@NonNull String projectSlug) {
+	public Optional<String> store(@NonNull MultipartFile multipartFile, @NonNull Project project) {
 		
 		Optional<String> location = null;
 		
 		try {
-			location = archiver.extract(multipartFile.getInputStream(), projectSlug);
+			location = archiver.extract(multipartFile.getInputStream(), project.getSlug());
 			
 			Optional<Path> projectLocation = this.pathListing(location.get())
 				.stream()
@@ -49,6 +57,9 @@ public class ProjectFileStorageService implements StorageService {
 			
 			location = projectLocation.isPresent() ? Optional.of(projectLocation.get().toAbsolutePath().toString()) : Optional.empty() ;
 			log.debug("File was saved");
+			
+			this.notifyObserver(location, project);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 			log.error(e.getMessage());
@@ -70,7 +81,7 @@ public class ProjectFileStorageService implements StorageService {
 			paths = Files.list(new File(location).toPath())
 					.limit(10)
 					.filter(this::excludeMacArchivedFolderFilter)
-					.peek(System.out::println)
+					.peek(p -> log.debug(p.toString()))
 					.collect(Collectors.toList())
 					;
 		} catch (IOException e) {
@@ -83,6 +94,13 @@ public class ProjectFileStorageService implements StorageService {
 	
 	private boolean excludeMacArchivedFolderFilter(Path path) {
 		return ! "__MACOSX".equals(path.getFileName().toString());
+	}
+	
+	private void notifyObserver(Optional<String> location, Project project) {
+		log.debug("Notify to observers");
+		observers.stream().forEach(o -> {
+			o.observedLocation(new File(location.get()).toPath(), project);
+		});
 	}
 
 }

@@ -42,7 +42,7 @@ public class ProjectFileStorageServiceTest {
 		when(mf.getInputStream()).thenReturn(zipStream);
 		when(mf.getOriginalFilename()).thenReturn("test.zip");
 		
-		Optional<String> location = projectFileStorage.store(mf, "ola");
+		Optional<String> location = projectFileStorage.store(mf, null);
 		assertTrue(location.isPresent());
 		assertThat(location.get(), is(endsWith("ola")));
 	}

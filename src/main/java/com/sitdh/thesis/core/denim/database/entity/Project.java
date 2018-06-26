@@ -1,6 +1,7 @@
 package com.sitdh.thesis.core.denim.database.entity;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -11,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -26,6 +28,7 @@ import lombok.Data;
 public class Project {
 
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
+	@JsonProperty(value="id")
 	private Integer pid;
 	
 	@Column(name="project_name")
@@ -55,6 +58,8 @@ public class Project {
 	@JoinColumn(name="owner") @JsonIgnore
 	private User owner;
 	
+	@OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL, mappedBy="project")
+	private List<FileInformation> files;
 	
 	@PrePersist
 	public void prePersist() {

@@ -78,6 +78,10 @@ public class UserService {
 		return newUser;
 	}
 	
+	public Optional<User> getUserInformation(Optional<String> username) {
+		return this.userRepo.findByUsername(username.orElse("----------------------"));
+	}
+	
 	public boolean isUsernameOrEmailExists(String username, String email) {
 		return this.userRepo.findByUsernameOrEmail(username, email).isPresent();
 	}

@@ -59,7 +59,7 @@ public class ProjectService {
 			project = this.entityMapping(formEntity);
 			project.setOwner(user);
 			this.storage
-				.store(formEntity.getFile(), project.getSlug())
+				.store(formEntity.getFile(), project)
 				.ifPresent(project::setLocation);
 			
 			project = this.projectRepo.save(project);
@@ -80,4 +80,17 @@ public class ProjectService {
 		
 		return project;
 	}
+
+	public Optional<Project> getProjectFromSlugAndOwner(String slug, String user) {
+		
+		return null;
+	}
+	
+	public Optional<Project> getProjectFromSlugAndOwner(String slug, User user) {
+		return user.getProjects()
+				.stream()
+				.filter(p -> p.getSlug().equals(slug))
+				.findFirst();
+	}
+	
 }
