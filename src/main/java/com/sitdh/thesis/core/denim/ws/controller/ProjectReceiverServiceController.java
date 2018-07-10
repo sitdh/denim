@@ -1,6 +1,5 @@
 package com.sitdh.thesis.core.denim.ws.controller;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,13 +23,12 @@ import com.sitdh.thesis.core.denim.database.service.ProjectService;
 import com.sitdh.thesis.core.denim.database.service.UserService;
 import com.sitdh.thesis.core.denim.form.entity.DestroyProjectFormEntity;
 import com.sitdh.thesis.core.denim.form.entity.ProjectFormEntity;
-import com.sitdh.thesis.core.denim.ws.error.ErrorMessageResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-public class ProjectReceiverServiceController {
+public class ProjectReceiverServiceController implements DefaultServiceController {
 	
 	private ProjectService projectService;
 	
@@ -67,15 +65,12 @@ public class ProjectReceiverServiceController {
 		if (projects.isPresent()) {
 			response = new ResponseEntity<>(projects.get(), headers, HttpStatus.OK);
 		} else {
-			
-			response = new ResponseEntity<>(
-					ErrorMessageResponse.builder()
-						.title("Information not found")
-						.description("Project is not available")
-						.timestamp(new Date())
-						.build(), 
-					headers, 
+			response = this.responseError(
+					"Information not found", 
+					"Project is not available", 
+					headers,
 					HttpStatus.BAD_REQUEST);
+			
 		}
 		
 		return response;
@@ -100,7 +95,6 @@ public class ProjectReceiverServiceController {
 	
 	@PostMapping("/project/new")
 	public ResponseEntity<?> createNewProject(@ModelAttribute ProjectFormEntity formEntity) {
-		System.out.println(formEntity);
 		
 		Optional<AccessToken> accessToken = this.tokenService
 				.accessTokenForUserCredential(
@@ -108,18 +102,17 @@ public class ProjectReceiverServiceController {
 						formEntity.getUser());
 		
 		ResponseEntity<?> response = null;
-		
 		Optional<Project> project = this.createProject(accessToken, formEntity);
 		
 		if (project.isPresent()) {
 			response = new ResponseEntity<>(project.get(), headers, HttpStatus.ACCEPTED);
 		} else {
-			ErrorMessageResponse responseMeessage = ErrorMessageResponse.builder()
-					.title("Invalid project information")
-					.description("Project information is invalid please try again later")
-					.timestamp(new Date())
-					.build();
-			response = new ResponseEntity<>(responseMeessage, headers, HttpStatus.BAD_REQUEST);
+			response = this.responseError(
+					"Invalid project information", 
+					"Project information is invalid please try again later", 
+					headers,
+					HttpStatus.BAD_REQUEST); 
+					
 		}
 		
 		return response;

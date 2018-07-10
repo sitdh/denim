@@ -1,6 +1,5 @@
 package com.sitdh.thesis.core.denim.ws.controller;
 
-import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +19,12 @@ import com.sitdh.thesis.core.denim.database.service.AccessTokenService;
 import com.sitdh.thesis.core.denim.database.service.UserService;
 import com.sitdh.thesis.core.denim.form.entity.AuthenticatedInformationResponseEntity;
 import com.sitdh.thesis.core.denim.form.entity.UserEntity;
-import com.sitdh.thesis.core.denim.ws.error.ErrorMessageResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-public class UserServiceController {
+public class UserServiceController implements DefaultServiceController {
 	
 	private UserService userService;
 	
@@ -56,13 +54,12 @@ public class UserServiceController {
 			response = new ResponseEntity<>(user.get(), headers, HttpStatus.ACCEPTED);
 		} else {
 			log.error("Invalid data");
-			ErrorMessageResponse errorMessage = ErrorMessageResponse.builder()
-					.description("No data information")
-					.title("Invalid information")
-					.timestamp(new Date())
-					.build();
 			
-			response = new ResponseEntity<>(errorMessage, headers, HttpStatus.BAD_REQUEST);
+			response = this.responseError(
+					"No data information",
+					"Invalid information",
+					headers, 
+					HttpStatus.BAD_REQUEST);
 		}
 
 		return response;
@@ -77,12 +74,12 @@ public class UserServiceController {
 		if (accToken.isPresent()) {
 			response = new ResponseEntity<>(accToken.get(), headers, HttpStatus.OK);
 		} else {
-			ErrorMessageResponse errorMessage = ErrorMessageResponse.builder()
-					.description("Wrong username credential")
-					.title("Unauthorized")
-					.timestamp(new Date())
-					.build();
-			response = new ResponseEntity<>(errorMessage, headers, HttpStatus.BAD_REQUEST);
+			log.debug("Unauthorized: Bad request");
+			response = this.responseError(
+					"Unauthorized",
+					"Wrong username credential",
+					headers, 
+					HttpStatus.BAD_REQUEST);
 		}
 		
 		return response;
@@ -104,12 +101,11 @@ public class UserServiceController {
 					HttpStatus.OK);
 		} else {
 			log.debug("User not found: " + username);
-			ErrorMessageResponse errorMessage = ErrorMessageResponse.builder()
-					.description("Wrong username or password")
-					.title("Unauthorized")
-					.timestamp(new Date())
-					.build();
-			response = new ResponseEntity<>(errorMessage, headers, HttpStatus.UNAUTHORIZED);
+			response = this.responseError(
+					"Unauthorized",
+					"Wrong username or password",
+					headers, 
+					HttpStatus.UNAUTHORIZED);
 		}
 		
 		return response;
@@ -128,13 +124,11 @@ public class UserServiceController {
 			response = new ResponseEntity<>(token.get(), headers, HttpStatus.OK);
 		} else {
 			log.error("Invalid credential");
-			ErrorMessageResponse errorMessage = ErrorMessageResponse.builder()
-					.description("Credential not found")
-					.title("Invalid credential")
-					.timestamp(new Date())
-					.build();
-			
-			response = new ResponseEntity<>(errorMessage, headers, HttpStatus.BAD_REQUEST);
+			response = this.responseError(
+					"Invalid credential",
+					"Credential not found",
+					headers, 
+					HttpStatus.BAD_REQUEST);
 		}
 		
 		return response;
@@ -145,31 +139,30 @@ public class UserServiceController {
 			@PathVariable("username") String username, 
 			@RequestParam("access_token") String token) {
 		
-		ErrorMessageResponse responseMessage = null;
-		HttpStatus status = HttpStatus.OK;
+		ResponseEntity<?> responseMessage = null;
 		
 		Optional<AccessToken> accToken = this.accessTokenService.accessTokenForUserCredential(token, username);
 		if (accToken.isPresent()) {
 			log.debug("Credential found, killing access token");
 			this.accessTokenService.killAccessToken(accToken.get());
-			
-			responseMessage = ErrorMessageResponse.builder()
-					.title("Signout completed")
-					.description("You already signout.")
-					.timestamp(new Date())
-					.build();
+			responseMessage = this.responseError(
+					"Signout completed", 
+					"You already signout.", 
+					headers, 
+					HttpStatus.OK);
 			
 		} else {
 			log.debug("Invalid access token");
-			responseMessage = ErrorMessageResponse.builder()
-					.title("Invalid credential")
-					.description("No credential found.")
-					.timestamp(new Date())
-					.build();
-			status = HttpStatus.BAD_REQUEST;
+			responseMessage = this.responseError(
+					"Invalid credential", 
+					"No credential found.", 
+					headers, 
+					HttpStatus.BAD_REQUEST);
+			
+			
 		}
 		
-		return new ResponseEntity<>(responseMessage, headers, status);
+		return responseMessage;
 	}
 
 }

@@ -1,6 +1,5 @@
 package com.sitdh.thesis.core.denim.ws.controller;
 
-import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +16,12 @@ import com.sitdh.thesis.core.denim.database.entity.AccessToken;
 import com.sitdh.thesis.core.denim.database.entity.Project;
 import com.sitdh.thesis.core.denim.database.service.AccessTokenService;
 import com.sitdh.thesis.core.denim.database.service.UserService;
-import com.sitdh.thesis.core.denim.ws.error.ErrorMessageResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-public class ProjectAnalyzerServiceController {
+public class ProjectAnalyzerServiceController implements DefaultServiceController {
 	
 	private AccessTokenService tokenService;
 	
@@ -64,13 +62,12 @@ public class ProjectAnalyzerServiceController {
 			this.structureAnalyzer.analyze(project.get());
 			
 		} else {
-			response = new ResponseEntity<>(
-					ErrorMessageResponse.builder()
-						.title("Invalid credential")
-						.description("Invalid credetial please try again")
-						.timestamp(new Date()).build(),
-					headers,
+			response = this.responseError(
+					"Invalid credential", 
+					"Invalid credetial please try again", 
+					headers, 
 					HttpStatus.UNAUTHORIZED);
+			
 		}
 		
 		
