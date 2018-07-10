@@ -17,23 +17,30 @@ import lombok.Data;
 
 @Data
 @Entity @Table
-public class MethodInformation {
-	
+public class MethodGraph {
+
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
-	private Integer methodId;
+	private Integer mgId;
+	
+	private String lineNumber;
 	
 	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JoinColumn(name="class_name")
-	private FileInformation className;
+	@JoinColumn(name="method_name")
+	private MethodInformation methodName;
 	
-	private String methodName;
+	private String instructions;
 	
-	private String signature;
+	private String nextLines;
 	
-	@OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL, mappedBy="methodName")
-	private List<MethodGraph> graph;
+	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JoinColumn(name="invoke")
+	private MethodInformation invoke;
 	
-	@OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL, mappedBy="invoke")
-	private List<MethodGraph> invoked;
-
+	@OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL, mappedBy="previous")
+	private List<MethodGraph> next;
+	
+	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JoinColumn(name="previous")
+	private MethodGraph previous;
+	
 }

@@ -34,7 +34,7 @@ public class ProjectServiceTest {
 	
 	private User mockUser;
 	
-	private List<Project> aProject, projects, noProject, otherUserProjects;
+	private List<Project> aProject; //, projects, noProject, otherUserProjects;
 
 	@Before
 	public void setUp() throws Exception {
@@ -63,10 +63,10 @@ public class ProjectServiceTest {
 		p2.setPid(2);
 		p2.setOwner(otherUser);
 		
-		noProject = Lists.newArrayList();
+//		noProject = Lists.newArrayList();
 		aProject = List.of(p);
-		projects = List.of(p, p2);
-		otherUserProjects = List.of(p2);
+//		projects = List.of(p, p2);
+//		otherUserProjects = List.of(p2);
 	}
 
 	@Test

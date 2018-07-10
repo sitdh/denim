@@ -1,5 +1,7 @@
 package com.sitdh.thesis.core.denim.database.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,5 +27,9 @@ public class FileInformationService {
 		file.setProject(project);
 		
 		return this.fileRepo.save(file);
+	}
+
+	public Optional<FileInformation> getFileInformationFromClassname(String className) {
+		return this.fileRepo.findByClassName(className);
 	}
 }

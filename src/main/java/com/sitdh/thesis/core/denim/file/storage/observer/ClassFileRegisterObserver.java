@@ -1,5 +1,6 @@
 package com.sitdh.thesis.core.denim.file.storage.observer;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -48,6 +49,9 @@ public class ClassFileRegisterObserver implements StorageObserver {
 						.replace(".class", "")
 					);
 			fileInfo.setLocation(f.getAbsolutePath());
+			this.javaSourceFile(f.toPath()).ifPresent(p -> {
+				fileInfo.setSourceLocation(p.toFile().getAbsolutePath());
+			});
 			
 			String path = this.extractPackageName(f.getAbsolutePath(), f.getName());
 			fileInfo.setPackageName(path);
@@ -69,6 +73,21 @@ public class ClassFileRegisterObserver implements StorageObserver {
 			.replace("/" + filename, "")
 			.replaceAll("/", ".")
 			;
+	}
+	
+	private Optional<Path> javaSourceFile(Path classPath) {
+		Optional<Path> path = Optional.ofNullable(null);
+		String location = classPath.toString()
+				.replaceAll("target/classes", "src/main/java")
+				.replaceAll(".class", ".java")
+				;
+		
+		File sourceFile = new File(location);
+		if (sourceFile.exists() && sourceFile.isFile()) {
+			path = Optional.ofNullable(sourceFile.toPath());
+		}
+		
+		return path;
 	}
 
 }

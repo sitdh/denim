@@ -25,6 +25,8 @@ public class FileInformation {
 	
 	private String location;
 	
+	private String sourceLocation;
+	
 	private String packageName;
 	
 	@Column(name="class_name")
@@ -36,5 +38,8 @@ public class FileInformation {
 	
 	@OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL, mappedBy="fileInfo")
 	private List<ConstantValue> constants;
+	
+	@OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL, mappedBy="className")
+	private List<MethodInformation> methods;
 
 }
